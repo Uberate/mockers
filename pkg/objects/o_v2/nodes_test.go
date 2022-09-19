@@ -1,4 +1,4 @@
-package objects
+package o_v2
 
 import (
 	"reflect"
@@ -12,9 +12,9 @@ func TestNodeData_To(t *testing.T) {
 		}
 	}
 	tests := []struct {
-		name    string
-		n       NodeData
-		args    args
+		name string
+		n    NodeData
+		args args
 		wantErr bool
 	}{
 		{name: "test node data to object", n: NodeData{"test": "test"}, args: args{obj: struct {

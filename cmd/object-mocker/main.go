@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"mockers/internal/web/server"
-	"mockers/pkg/objects/web"
+	"mockers/pkg/objects/o_v2/web"
 )
 
 func main() {

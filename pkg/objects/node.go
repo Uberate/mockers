@@ -1,8 +1,6 @@
 package objects
 
-import (
-	"github.com/mitchellh/mapstructure"
-)
+import "github.com/mitchellh/mapstructure"
 
 // NodeData save the data of node in a map[string]interface{}
 type NodeData map[string]interface{}
@@ -23,7 +21,7 @@ func NewNodeData(obj interface{}) (NodeData, error) {
 type NodeObject struct {
 	Metadata NodeMetadata `json:"_metadata"`
 
-	// Data contain all data of object
+	// Data contain al data of object
 	Data NodeData `json:"data"`
 }
 

@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"mockers/internal/web/server"
-	"mockers/pkg/objects"
+	"mockers/pkg/objects/o_v2"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-var objectInstance = objects.Tree{}
+var objectInstance = o_v2.Tree{}
 
 func Handlers() []server.GinHandler {
 	res := []server.GinHandler{
@@ -86,7 +86,7 @@ func PostData(ctx *gin.Context) {
 		return
 	}
 
-	var metadata objects.NodeMetadata
+	var metadata o_v2.NodeMetadata
 	if metadata, err = objectInstance.AddNodeDataToPath(body, path); err != nil {
 		ctx.JSONP(http.StatusInternalServerError, err)
 	} else {

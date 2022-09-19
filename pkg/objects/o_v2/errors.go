@@ -1,4 +1,4 @@
-package objects
+package o_v2
 
 import (
 	"mockers/pkg/errors"
