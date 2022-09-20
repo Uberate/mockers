@@ -6,6 +6,8 @@ func NewHeadListHead[T any]() *HeadListHead[T] {
 	return &HeadListHead[T]{len: 0}
 }
 
+// HeadListHead is a linked list head. It save the first and last element of the linked list. And this is un-thread-
+// safe list.
 type HeadListHead[T any] struct {
 	FirstEle *HeadListNode[T]
 	LastEle  *HeadListNode[T]
