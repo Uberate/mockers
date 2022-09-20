@@ -1,6 +1,6 @@
 # Mocker for golang
 Status:
-`Go test`: [![Go](https://github.com/Uberate/mockers/actions/workflows/go.yml/badge.svg?event=push)](https://github.com/Uberate/mockers/actions/workflows/go.yml)
+`Go test`: [![code-test](https://github.com/Uberate/mockers/actions/workflows/code-test.yml/badge.svg)](https://github.com/Uberate/mockers/actions/workflows/code-test.yml)
 
 Provide some tools to quickly create fake data.
 
