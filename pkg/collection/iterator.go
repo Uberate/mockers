@@ -1,9 +1,14 @@
 package collection
 
-type Iterator[T any] interface {
+type ReadonlyIterator[T any] interface {
 	Next() T
 	Pre() T
 	HasNext() bool
 	HasPre() bool
+}
+
+type Iterator[T any] interface {
+	ReadonlyIterator[T]
+
 	Remove()
 }

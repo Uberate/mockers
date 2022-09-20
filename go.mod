@@ -1,4 +1,4 @@
-module mockers
+module github.com/uberate/mockers
 
 go 1.18
 
