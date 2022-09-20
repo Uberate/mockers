@@ -1,0 +1,11 @@
+# For idea
+.idea
+
+# For build res
+output/
+
+# For ignore file directly
+ignore/
+
+# For mac
+.DS_Store
