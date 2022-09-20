@@ -5,6 +5,7 @@ Status:
 
 ![Stars](https://img.shields.io/github/stars/Uberate/mockers?label=Stars)
 ![Forks](https://img.shields.io/github/forks/Uberate/mockers?label=Forks)
+![License](https://img.shields.io/github/license/Uberate/mockers?label=LICENSE)
 
 Provide some tools to quickly create fake data.
 
