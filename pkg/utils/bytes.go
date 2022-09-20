@@ -107,7 +107,7 @@ func AnyNumberToBytes(x uint64, size int) []byte {
 	res := make([]byte, length, length)
 	for i := length - 1; i >= 0; i-- {
 		res[i] = byte(x)
-		x = x << 8
+		x = x >> 8
 	}
 
 	return res

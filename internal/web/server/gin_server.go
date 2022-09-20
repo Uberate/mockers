@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"mockers/pkg/errors"
+	"mockers/pkg/i18n"
 	"net/http"
 	"strings"
 )
@@ -123,9 +124,9 @@ func ResError(ctx *gin.Context, code *int, err error) {
 		code = &x
 	}
 	if e, ok := errors.IsHttpErrorItem(err); ok {
-		ctx.JSONP(e.Code, e.ErrorWithLanguage(GetLanguage(ctx)))
+		ctx.JSONP(e.Code, e.ErrorWithLanguage(i18n.LanguageKey(GetLanguage(ctx))))
 	} else if e, ok := errors.IsErrorItem(err); ok {
-		ctx.JSONP(x, e.ErrorWithLanguage(GetLanguage(ctx)))
+		ctx.JSONP(x, e.ErrorWithLanguage(i18n.LanguageKey(GetLanguage(ctx))))
 	} else {
 		ctx.JSONP(x, err)
 	}
