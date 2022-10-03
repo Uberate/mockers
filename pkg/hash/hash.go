@@ -3,7 +3,7 @@ package hash
 import (
 	"crypto/sha256"
 	"fmt"
-	"mockers/pkg/utils"
+	"github.com/uberate/mockers/pkg/utils"
 	"reflect"
 )
 
