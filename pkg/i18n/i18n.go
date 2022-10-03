@@ -17,6 +17,8 @@ type I18n struct {
 	DefaultLanguage LanguageKey
 }
 
+// MessageWithParam return the template message info with params. The base is invoked the fmt.Sprintf(). If not found,
+// return string in format 'namespace-code' and false.
 func (i *I18n) MessageWithParam(ln LanguageKey, namespace, code string, params ...any) (string, bool) {
 	if languageItem, ok := i.Languages[ln]; ok {
 		return languageItem.MessageWithParam(namespace, code, params...)
@@ -25,6 +27,8 @@ func (i *I18n) MessageWithParam(ln LanguageKey, namespace, code string, params .
 	return "", false
 }
 
+// Message return the message info. Different from the MessageWithParam, it is return value directly. If not found
+// specify value, return string in format 'namespace-code' and false.
 func (i *I18n) Message(ln LanguageKey, namespace, code string) (string, bool) {
 	if languageItem, ok := i.Languages[ln]; ok {
 		return languageItem.Message(namespace, code)
@@ -32,6 +36,7 @@ func (i *I18n) Message(ln LanguageKey, namespace, code string) (string, bool) {
 	return "", false
 }
 
+// RegisterMessage will register a language to the namespace.
 func (i *I18n) RegisterMessage(ln LanguageKey, namespace, code, message string) {
 	if i.Languages == nil {
 		i.Languages = map[LanguageKey]*Language{}
@@ -82,7 +87,7 @@ func (l *Language) RegisterMessage(namespace, code, message string) {
 
 // Namespace --------------------------------------------------
 
-// Namespace is a middle layout to help deal the complex system. You can disable this layout by I18n settings.
+// Namespace is a middle layout to help deal the complex system.
 type Namespace struct {
 	Namespace string
 	Messages  map[string]*Message
