@@ -4,6 +4,17 @@ import (
 	"os"
 )
 
+// IsFileExists return true when file is exists
+func IsFileExists(path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsPermission(err) {
+			return true
+		}
+		return false
+	}
+	return true
+}
+
 func ReadFile(path string) ([]byte, error) {
 	return os.ReadFile(path)
 }
