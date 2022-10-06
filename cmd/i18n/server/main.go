@@ -7,6 +7,7 @@ import (
 	"github.com/uberate/mockers/cmd/i18n/server/cfg"
 	"github.com/uberate/mockers/cmd/utils"
 	"github.com/uberate/mockers/pkg/i18n"
+	"net/http"
 )
 
 var i18nCenter i18n.I18n
@@ -28,7 +29,18 @@ func main() {
 
 	// get one message info
 	engine.GET("message/:ln/:namespace/:code", func(context *gin.Context) {
+		ln := context.Param("ln")
+		namespace := context.Param("namespace")
+		code := context.Param("code")
+		value, ok := i18nCenter.Message(i18n.GetLanguageKey(ln), namespace, code)
+		if !ok {
+			if webConfig.NotFoundWith404 {
+				context.JSON(http.StatusNotFound, nil)
+				return
+			}
+		}
 
+		context.JSON(http.StatusOK, map[string]string{"value": value})
 	})
 
 	if err := server.GinStart(engine, webConfig.WebCfg); err != nil {

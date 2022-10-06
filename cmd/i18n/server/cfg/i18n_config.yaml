@@ -1,2 +1,3 @@
 web:
-#  port: ":3003"
+  port: ":3003"
+not_found_with_404: false
