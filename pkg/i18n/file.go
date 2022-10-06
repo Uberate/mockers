@@ -10,8 +10,95 @@ var (
 	CSVBlockHeader = []string{"namespace", "code"}
 )
 
-// BuildFromCSVDir will build an i18n values from specify csv-file.
-func BuildFromCSVDir(fileName string) (*I18n, error) {
+// ToCSVFile will write the i18n value to a csv file. And all the info will be writen to a file. When occur the error at
+// create, the error will be return. And the value will be cover.
+//
+// ToCSVFile use the encoding/csv directly. About more info of the csv file, see the doc of encoding/csv.
+func ToCSVFile(fileName string, instance *I18n) error {
+	if instance == nil {
+		return fmt.Errorf("The I18n instance is nil ")
+	}
+
+	// Build the csv info. It will spend some time.
+
+	// get all i18n message info as an array.
+	messageObjects := instance.ToMessageObjects()
+	res := [][]string{
+		// the res first line the header of the message.
+		CSVBlockHeader,
+	}
+
+	// The resNamespaceCodeMapper will mapper the index of message of code and message. And all the ln message value is
+	// in one line. The index of resNamespaceCodeMapper always start from 2.
+	resNamespaceCodeMapper := map[string]map[string]int{}
+
+	// The lnMapper is to help quick index the ln info.
+	lnMapper := map[string]int{}
+
+	// build the info of the message object.
+
+	// the inner-index is the index of the message index in the res.
+	// the index like it:
+	//
+	// index, namespace, code, en, zh-cn
+	// 1(because the index is start from the second line), namespace_1, 00001, test, 测试
+	// 2, namespace_1, 00002, (empty, in the file, it will not be written.),,
+	// 3, namespace_2, 00001, ,
+	// the index will be cached in the namespaceCodeInnerIndex.
+	namespaceCodeInnerIndex := 1
+	lnInnerIndex := 0
+	for _, item := range messageObjects {
+		// pre do, to check the index.
+		if _, ok := resNamespaceCodeMapper[item.Namespace]; !ok {
+			resNamespaceCodeMapper[item.Namespace] = map[string]int{}
+		}
+		if _, ok := resNamespaceCodeMapper[item.Namespace][item.Code]; !ok {
+			resNamespaceCodeMapper[item.Namespace][item.Code] = namespaceCodeInnerIndex
+			// insert new value of message
+			namespaceCodeInnerIndex++
+
+			res = append(res, []string{item.Namespace, item.Code})
+		}
+		if _, ok := lnMapper[item.Language.ToString()]; !ok {
+			lnMapper[item.Language.ToString()] = lnInnerIndex + 2
+			res[0] = append(res[0], item.Language.ToString())
+			lnInnerIndex++
+		}
+
+		if len(res[resNamespaceCodeMapper[item.Namespace][item.Code]]) < 2+lnMapper[item.Language.ToString()] {
+			// len of []string{namespace, code} is 2, but the last index is 1, so, to fill ln index - (ln() + 1)
+			for i := len(res[resNamespaceCodeMapper[item.Namespace][item.Code]]) - 1; i < lnMapper[item.Language.ToString()]; i++ {
+				res[resNamespaceCodeMapper[item.Namespace][item.Code]] =
+					append(res[resNamespaceCodeMapper[item.Namespace][item.Code]], "")
+			}
+		}
+
+		// add a message
+		res[resNamespaceCodeMapper[item.Namespace][item.Code]][lnMapper[item.Language.ToString()]] = item.Message
+	}
+
+	// fill all namespace
+	for i := 1; i < len(res); i++ {
+		for len(res[i]) < len(res[0]) {
+			res[i] = append(res[i], "")
+		}
+	}
+
+	// open the csv file, and ready to write value.
+	csvFile, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer func(csvFile *os.File) {
+		_ = csvFile.Close()
+	}(csvFile)
+
+	writer := csv.NewWriter(csvFile)
+	return writer.WriteAll(res)
+}
+
+// BuildFromCSVFile will build an i18n values from specify csv-file.
+func BuildFromCSVFile(fileName string) (*I18n, error) {
 	csvFile, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
