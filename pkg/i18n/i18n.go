@@ -77,7 +77,8 @@ func (i *I18n) MessageWithParam(ln LanguageKey, namespace, code string, params .
 		return languageItem.MessageWithParam(namespace, code, params...)
 	}
 
-	if ln != i.DefaultLanguage {
+	// if the default language has value, search in default language scope.
+	if ln != i.DefaultLanguage && len(i.DefaultLanguage) != 0 && i.DefaultLanguage != EmptyLanguage {
 		return i.MessageWithParam(i.DefaultLanguage, namespace, code, params...)
 	}
 
@@ -92,7 +93,8 @@ func (i *I18n) Message(ln LanguageKey, namespace, code string) (string, bool) {
 		return languageItem.Message(namespace, code)
 	}
 
-	if ln != i.DefaultLanguage {
+	// if the default language has value, search in default language scope.
+	if ln != i.DefaultLanguage && len(i.DefaultLanguage) != 0 && i.DefaultLanguage != EmptyLanguage {
 		return i.Message(i.DefaultLanguage, namespace, code)
 	}
 

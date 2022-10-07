@@ -11,8 +11,9 @@ func (lk LanguageKey) ToString() string {
 }
 
 const (
-	EN   LanguageKey = "EN"
-	ZHCN LanguageKey = "ZHCN"
+	EN            LanguageKey = "EN"
+	ZHCN          LanguageKey = "ZHCN"
+	EmptyLanguage LanguageKey = "__empty__"
 )
 
 func GetLanguageKey(ln string) LanguageKey {
@@ -22,6 +23,6 @@ func GetLanguageKey(ln string) LanguageKey {
 	case ZHCN.ToString():
 		return ZHCN
 	default:
-		return EN
+		return EmptyLanguage
 	}
 }

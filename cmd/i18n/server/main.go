@@ -27,6 +27,8 @@ func main() {
 		panic(err)
 	}
 
+	i18nCenter.DefaultLanguage = i18n.GetLanguageKey(webConfig.DefaultLanguage)
+
 	// get one message info
 	engine.GET("message/:ln/:namespace/:code", func(context *gin.Context) {
 		ln := context.Param("ln")
@@ -49,9 +51,4 @@ func main() {
 	if err := server.GinStart(engine, webConfig.WebCfg); err != nil {
 		panic(err)
 	}
-}
-
-func init() {
-	// read the config
-
 }
