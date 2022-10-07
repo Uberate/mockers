@@ -166,6 +166,15 @@ type Language struct {
 	Namespaces map[string]*Namespace
 }
 
+func (l *Language) ListNamespaces() []string {
+	var res []string
+	for key, _ := range l.Namespaces {
+		res = append(res, key)
+	}
+
+	return res
+}
+
 func (l *Language) Len() int {
 	res := 0
 	for _, namespaceItem := range l.Namespaces {
