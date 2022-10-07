@@ -12,4 +12,7 @@ type I18nWebConfig struct {
 	// If specify message not found in specify language, will search message in default language scope. If is emtpy,
 	// ignore the default language.
 	DefaultLanguage string `json:"default_language" yaml:"default_language" mapstructure:"default_language"`
+
+	// If enable change, all the behavior will add a locker to lock the i18n value. It was lower performance.
+	EnableChange bool `json:"enable_change" yaml:"enable_change" mapstructure:"enable_change"`
 }

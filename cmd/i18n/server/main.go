@@ -5,12 +5,10 @@ import (
 	"github.com/uberate/mockers/cmd/common/server"
 	cfg2 "github.com/uberate/mockers/cmd/common/server/cfg"
 	"github.com/uberate/mockers/cmd/i18n/server/cfg"
+	"github.com/uberate/mockers/cmd/i18n/server/handler"
 	"github.com/uberate/mockers/cmd/utils"
 	"github.com/uberate/mockers/pkg/i18n"
-	"net/http"
 )
-
-var i18nCenter i18n.I18n
 
 func main() {
 
@@ -27,26 +25,27 @@ func main() {
 		panic(err)
 	}
 
-	i18nCenter.DefaultLanguage = i18n.GetLanguageKey(webConfig.DefaultLanguage)
+	var i18nInstanceOptions []i18n.Option = make([]i18n.Option, 0, 2)
+
+	if webConfig.EnableChange {
+		i18nInstanceOptions = append(i18nInstanceOptions, i18n.EnableI18nChange())
+	}
+	i18nInstanceOptions = append(i18nInstanceOptions, i18n.DefaultLanguage(webConfig.DefaultLanguage))
+
+	i18nInstance := handler.I18nHandlers{
+		I18nCenter: *i18n.NewI18nInstance(i18nInstanceOptions...),
+		WebConfig:  webConfig,
+	}
+
+	engine.GET("config", func(context *gin.Context) {
+		utils.Success(context, webConfig)
+	})
+
+	engine.GET("languages", i18nInstance.Languages)
 
 	// get one message info
-	engine.GET("message/:ln/:namespace/:code", func(context *gin.Context) {
-		ln := context.Param("ln")
-		namespace := context.Param("namespace")
-		code := context.Param("code")
-		value, ok := i18nCenter.Message(i18n.GetLanguageKey(ln), namespace, code)
-		if !ok {
-			// if specify message not found, and set return 404 when target specify message not found. return nil with
-			// 404 value.
-			if webConfig.NotFoundWith404 {
-				// TODO : quick return 404 status with nil object.
-				context.JSON(http.StatusNotFound, nil)
-				return
-			}
-		}
-
-		context.JSON(http.StatusOK, map[string]string{"value": value})
-	})
+	engine.GET("language/:ln/namespace/:namespace/code/:code", i18nInstance.Message)
+	engine.POST("language/:ln/namespace/:namespace/code/:code", i18nInstance.Create)
 
 	if err := server.GinStart(engine, webConfig.WebCfg); err != nil {
 		panic(err)

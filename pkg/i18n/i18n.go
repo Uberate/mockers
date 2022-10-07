@@ -7,7 +7,10 @@
 // i18n system. Like error, user, application and so on. In different namespace, the code can be same.
 package i18n
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 // MessageObject I18n quick struct.
 type MessageObject struct {
@@ -23,6 +26,9 @@ type MessageObject struct {
 // should build at application bootstrap age. And after build, the info should not be changed, else maybe has error.
 // And you can't remove the i18n info by handler. But you can set emtpy info to remove a message. If specify namespace
 // already has same code message, the old message will be replaced.
+//
+// The i18n is a thread-safe object, and you can open this feature by EnableI18nChange option. Because in some time, the
+// i18n system is always read-only.
 type I18n struct {
 	Languages map[LanguageKey]*Language
 
@@ -34,10 +40,18 @@ type I18n struct {
 	//--------------------------------------------------
 	// inner settings, like index status.
 
+	// if the i18n is enabled change, it will make i18n instance lower performance.
+	EnableChange bool
+
+	RWLocker *sync.RWMutex
 }
 
-// Len return the message count of current I18n.
+// Len return the message count of current I18n. It was an atomic operator.
 func (i *I18n) Len() int {
+	if i.EnableChange {
+		i.RWLocker.RLock()
+		defer i.RWLocker.RUnlock()
+	}
 	res := 0
 	for _, languageItem := range i.Languages {
 		res += languageItem.Len()
@@ -59,8 +73,12 @@ func (i *I18n) ToMessageObjects() []MessageObject {
 	return res
 }
 
-// WalkMessage will invoke the func for all message.
+// WalkMessage will invoke the func for all message. It was an atomic operator.
 func (i *I18n) WalkMessage(f func(key LanguageKey, namespace, code, message string)) {
+	if i.EnableChange {
+		i.RWLocker.RLock()
+		defer i.RWLocker.RUnlock()
+	}
 	for ln, namespaceItems := range i.Languages {
 		for namespace, messageItems := range namespaceItems.Namespaces {
 			for code, message := range messageItems.Messages {
@@ -71,8 +89,13 @@ func (i *I18n) WalkMessage(f func(key LanguageKey, namespace, code, message stri
 }
 
 // MessageWithParam return the template message info with params. The base is invoked the fmt.Sprintf(). If not found,
-// return string in format 'namespace-code' and false.
+// return string in format 'namespace-code' and false. It was an atomic operator.
 func (i *I18n) MessageWithParam(ln LanguageKey, namespace, code string, params ...any) (string, bool) {
+	if i.EnableChange {
+		i.RWLocker.RLock()
+		defer i.RWLocker.RUnlock()
+	}
+
 	if languageItem, ok := i.Languages[ln]; ok {
 		return languageItem.MessageWithParam(namespace, code, params...)
 	}
@@ -87,8 +110,12 @@ func (i *I18n) MessageWithParam(ln LanguageKey, namespace, code string, params .
 }
 
 // Message return the message info. Different from the MessageWithParam, it is return value directly. If not found
-// specify value, return string in format 'namespace-code' and false.
+// specify value, return string in format 'namespace-code' and false. It was an atomic operator.
 func (i *I18n) Message(ln LanguageKey, namespace, code string) (string, bool) {
+	if i.EnableChange {
+		i.RWLocker.RLock()
+		defer i.RWLocker.RUnlock()
+	}
 	if languageItem, ok := i.Languages[ln]; ok {
 		return languageItem.Message(namespace, code)
 	}
@@ -103,8 +130,17 @@ func (i *I18n) Message(ln LanguageKey, namespace, code string) (string, bool) {
 }
 
 // RegisterMessage will register a language to the namespace. If the code already in a namespace, the old message info
-// will be replaced. If input message info is empty, the message will be removed.
+// will be replaced. If input message info is empty, the message will be removed. And if i18n instance not enable
+// change, reject register operator.
 func (i *I18n) RegisterMessage(ln LanguageKey, namespace, code, message string) {
+	if i.EnableChange {
+		i.RWLocker.Lock()
+		defer i.RWLocker.Unlock()
+	} else {
+		// if not enable the change, reject thr register operator.
+		return
+	}
+
 	if i.Languages == nil {
 		i.Languages = map[LanguageKey]*Language{}
 	}
