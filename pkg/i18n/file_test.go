@@ -6,13 +6,13 @@ import (
 )
 
 func TestToCSVFile(t *testing.T) {
-	i18nInstance := I18n{}
+	i18nInstance := NewI18nInstance(EnableI18nChange())
 	i18nInstance.RegisterMessage(EN, "test", "test", "test")
 	i18nInstance.RegisterMessage(ZHCN, "test", "test", "测试")
 	i18nInstance.RegisterMessage(ZHCN, "test2", "test", "测试")
 	i18nInstance.RegisterMessage(EN, "test", "test2", "test")
 
-	if err := ToCSVFile("./test/test.csv", &i18nInstance); err != nil {
+	if err := ToCSVFile("./test/test.csv", i18nInstance); err != nil {
 		t.Error(err)
 		return
 	}
