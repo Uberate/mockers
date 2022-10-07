@@ -2,3 +2,4 @@ web:
   # The web use gin framework, default port is 3000
   port: ":3000"
 not_found_with_404: false
+enable_change: true

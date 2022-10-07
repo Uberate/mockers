@@ -10,6 +10,7 @@ func TestToCSVFile(t *testing.T) {
 	i18nInstance.RegisterMessage(EN, "test", "test", "test")
 	i18nInstance.RegisterMessage(ZHCN, "test", "test", "测试")
 	i18nInstance.RegisterMessage(ZHCN, "test2", "test", "测试")
+	i18nInstance.RegisterMessage(EN, "testzzz", "test2", "test")
 	i18nInstance.RegisterMessage(EN, "test", "test2", "test")
 
 	if err := ToCSVFile("./test/test.csv", i18nInstance); err != nil {

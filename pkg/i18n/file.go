@@ -4,6 +4,8 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 )
 
 var (
@@ -23,6 +25,12 @@ func ToCSVFile(fileName string, instance *I18n) error {
 
 	// get all i18n message info as an array.
 	messageObjects := instance.ToMessageObjects()
+	sort.SliceStable(messageObjects, func(i, j int) bool {
+		if messageObjects[i].Namespace != messageObjects[j].Namespace {
+			return strings.Compare(messageObjects[i].Namespace, messageObjects[j].Namespace) < 0
+		}
+		return strings.Compare(messageObjects[i].Code, messageObjects[j].Code) < 0
+	})
 	res := [][]string{
 		// the res first line the header of the message.
 		CSVBlockHeader,
