@@ -34,7 +34,10 @@ func main() {
 		code := context.Param("code")
 		value, ok := i18nCenter.Message(i18n.GetLanguageKey(ln), namespace, code)
 		if !ok {
+			// if specify message not found, and set return 404 when target specify message not found. return nil with
+			// 404 value.
 			if webConfig.NotFoundWith404 {
+				// TODO : quick return 404 status with nil object.
 				context.JSON(http.StatusNotFound, nil)
 				return
 			}
