@@ -10,6 +10,17 @@ type MessageObject struct {
 	Message   string      `json:"message" yaml:"message" mapstructure:"language"`
 }
 
+// I18n contains all message of language. The I18n struct provide some method to get message simple. In the struct, the
+// message will save as different language by I18n.RegisterMessage func. It can write value to the files and build from
+// the files. Note that, the I18n is not thread-safe, you should control it by yourself.
+//
+// If the I18n not set EnableChange, the I18n can't register any object. This will help to provide a high performance
+// function of I18n.Message and I18n.MessageWithParam.
+//
+// The I18n should build at the application bootstrap age. When the application core-logic is running, the I18n should
+// not change value. (But the control of the I18n server not in here).
+//
+// About the I18n more info, see the doc: TODO.
 type I18n struct {
 	messages map[string]map[string]map[LanguageKey]string
 
