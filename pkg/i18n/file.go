@@ -12,13 +12,9 @@ var (
 	CSVBlockHeader = []string{"namespace", "code"}
 )
 
-// ToCSVFile will write the i18n value to a csv file. And all the info will be writen to a file. When occur the error at
-// create, the error will be return. And the value will be cover.
-//
-// ToCSVFile use the encoding/csv directly. About more info of the csv file, see the doc of encoding/csv.
-func ToCSVFile(fileName string, instance *I18n) error {
+func ToCSVValue(instance *I18n) ([][]string, error) {
 	if instance == nil {
-		return fmt.Errorf("The I18n instance is nil ")
+		return nil, fmt.Errorf("The I18n instance is nil ")
 	}
 
 	// Build the csv info. It will spend some time.
@@ -91,6 +87,18 @@ func ToCSVFile(fileName string, instance *I18n) error {
 			res[i] = append(res[i], "")
 		}
 	}
+	return res, nil
+}
+
+// ToCSVFile will write the i18n value to a csv file. And all the info will be writen to a file. When occur the error at
+// create, the error will be return. And the value will be cover.
+//
+// ToCSVFile use the encoding/csv directly. About more info of the csv file, see the doc of encoding/csv.
+func ToCSVFile(fileName string, instance *I18n) error {
+	res, err := ToCSVValue(instance)
+	if err != nil {
+		return err
+	}
 
 	// open the csv file, and ready to write value.
 	csvFile, err := os.Create(fileName)
@@ -105,25 +113,10 @@ func ToCSVFile(fileName string, instance *I18n) error {
 	return writer.WriteAll(res)
 }
 
-// BuildFromCSVFile will build an i18n values from specify csv-file.
-func BuildFromCSVFile(fileName string) (*I18n, error) {
-	csvFile, err := os.Open(fileName)
-	if err != nil {
-		return nil, err
-	}
-	defer func(csvFile *os.File) {
-		_ = csvFile.Close()
-	}(csvFile)
-	csvReader := csv.NewReader(csvFile)
-
-	csvValue, err := csvReader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-
+func BuildFromCSV(csvValue [][]string) (*I18n, error) {
 	// get ln header
 	if len(csvValue) == 0 {
-		return nil, fmt.Errorf("The csv file is empty: %s ", fileName)
+		return nil, fmt.Errorf("The csv value is empty ")
 	}
 	if len(csvValue[0]) < 3 {
 		return nil, fmt.Errorf("The csv file must has one ln at least and the block value ")
@@ -164,4 +157,23 @@ func BuildFromCSVFile(fileName string) (*I18n, error) {
 	}
 
 	return res, nil
+}
+
+// BuildFromCSVFile will build an i18n values from specify csv-file.
+func BuildFromCSVFile(fileName string) (*I18n, error) {
+	csvFile, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer func(csvFile *os.File) {
+		_ = csvFile.Close()
+	}(csvFile)
+	csvReader := csv.NewReader(csvFile)
+
+	csvValue, err := csvReader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	return BuildFromCSV(csvValue)
 }
