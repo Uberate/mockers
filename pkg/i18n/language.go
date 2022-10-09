@@ -10,6 +10,7 @@ func (lk LanguageKey) ToString() string {
 	return strings.ToUpper(string(lk))
 }
 
+// todo add more info
 const (
 	EN            LanguageKey = "EN"
 	ZHCN          LanguageKey = "ZHCN"
