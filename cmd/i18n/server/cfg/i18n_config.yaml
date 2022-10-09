@@ -1,5 +1,25 @@
+## web
+## The web config is for gin-server. All the mocker http-server is used gin.
 web:
-  # The web use gin framework, default port is 3000
+  ## port
+  ## The web use gin framework, default port is ':3000'.
   port: ":3000"
+
+## not_found_with_404
+## If specify message not found, and set not_found_with_404, the return is empty, and the http-code is NotFound(404).
+## But if this param is false, will return OK(http-code: 200), and return value follow the format: 'namespace-code'.
+##
+## Default is false.
 not_found_with_404: false
+
+## enable_change
+## If enable change, the web server can write a message to the server. But it will make a lower-performance application
+## If set(default is false) false, the server is a read-only i18n-message server.
 enable_change: true
+
+## default_language:
+## If specify message not found in specify language, will try to search in default_language. If the default_language
+## is empty, ignore it.
+##
+## Default is emtpy.
+default_language: en

@@ -23,9 +23,16 @@ const (
 // ReadConfig will load the config from the env or file, it can receive the default value. And the first read env value.
 // About the param: 'configPathEnvKey', 'configShortKey', 'configFlagKey' and 'enableFlag' see the function:
 // Get GetConfigFilePath.
+//
+// The default value is from input param: 'config'. The config must a point. All the config can read from env
+// properties. And the level is ENV > config-file > default. Because, for simple change any config in docker or k8s env.
+//
+// If you want to custom the flags, you can set enableFlag is false, the ReadConfig will ignore all command flag.
+//
+// About the configPathEnvKey, configShortKey, configFlagKey and enableFlag, see the function: GetConfigFilePath.
 func ReadConfig(
 	configPathEnvKey, configShorKey, configFlagKey string, enableFlag bool, // config file settings
-	envKey string, defaults map[string]interface{}, config interface{}, // config read setting
+	envKey string, config interface{},                                      // config read setting
 ) error {
 
 	viperInstance := viper.NewWithOptions(
@@ -39,13 +46,6 @@ func ReadConfig(
 	}
 	if err := viperInstance.MergeConfigMap(originConfigMap); err != nil {
 		return err
-	}
-
-	// set the default value
-	if defaults != nil {
-		for defaultKey, defaultValue := range defaults {
-			viperInstance.SetDefault(defaultKey, defaultValue)
-		}
 	}
 
 	// try to search the file of config, but if not found the file, skip
